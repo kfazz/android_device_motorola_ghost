@@ -25,13 +25,13 @@
 #include <dlfcn.h>
 
 #include <linux/akm8975.h>
-#include <linux/stm401.h>
+#include <linux/msp430.h>
 
 #include <cutils/log.h>
 
-#include <hardware/mot_sensorhub_stm401.h>
+#include <hardware/mot_sensorhub_msp430.h>
 
-#include "stm401_hal.h"
+#include "msp430_hal.h"
 
 /*****************************************************************************/
 
@@ -52,20 +52,20 @@ HubSensor::HubSensor()
 
     open_device();
 
-    if (!ioctl(dev_fd, STM401_IOCTL_GET_SENSORS, &flags))  {
+    if (!ioctl(dev_fd, MSP430_IOCTL_GET_SENSORS, &flags))  {
         mEnabled = flags;
     }
 
-    if (!ioctl(dev_fd, STM401_IOCTL_GET_WAKESENSORS, &flags))  {
+    if (!ioctl(dev_fd, MSP430_IOCTL_GET_WAKESENSORS, &flags))  {
         mWakeEnabled = flags;
     }
 
     if ((fp = fopen(MAG_CAL_FILE, "r")) != NULL) {
-        for (i=0; i<STM401_MAG_CAL_SIZE; i++) {
+        for (i=0; i<MSP430_MAG_CAL_SIZE; i++) {
             mMagCal[i] = fgetc(fp);
         }
         fclose(fp);
-        err = ioctl(dev_fd, STM401_IOCTL_SET_MAG_CAL, &mMagCal);
+        err = ioctl(dev_fd, MSP430_IOCTL_SET_MAG_CAL, &mMagCal);
         if (err < 0) {
            ALOGE("Can't send Mag Cal data");
         }
@@ -112,14 +112,14 @@ int HubSensor::enable(int32_t handle, int en)
                 FILE *fp;
                 int i;
 
-                err = ioctl(dev_fd, STM401_IOCTL_GET_MAG_CAL, &mMagCal);
+                err = ioctl(dev_fd, MSP430_IOCTL_GET_MAG_CAL, &mMagCal);
                 if (err < 0) {
                     ALOGE("Can't read Mag Cal data");
                 } else {
                     if ((fp = fopen(MAG_CAL_FILE, "w")) == NULL) {
                         ALOGE("Can't open Mag Cal file");
                     } else {
-                        for (i=0; i<STM401_MAG_CAL_SIZE; i++) {
+                        for (i=0; i<MSP430_MAG_CAL_SIZE; i++) {
                             fputc(mMagCal[i], fp);
                         }
                         fclose(fp);
@@ -197,7 +197,7 @@ int HubSensor::enable(int32_t handle, int en)
     }
 
     if (found && (new_enabled != mEnabled)) {
-        err = ioctl(dev_fd, STM401_IOCTL_SET_SENSORS, &new_enabled);
+        err = ioctl(dev_fd, MSP430_IOCTL_SET_SENSORS, &new_enabled);
         ALOGE_IF(err, "Could not change sensor state (%s)", strerror(-err));
         if (!err) {
             mEnabled = new_enabled;
@@ -251,14 +251,14 @@ int HubSensor::enable(int32_t handle, int en)
                 FILE *fp;
                 int i;
 
-                err = ioctl(dev_fd, STM401_IOCTL_GET_MAG_CAL, &mMagCal);
+                err = ioctl(dev_fd, MSP430_IOCTL_GET_MAG_CAL, &mMagCal);
                 if (err < 0) {
                     ALOGE("Can't read Mag Cal data");
                 } else {
                     if ((fp = fopen(MAG_CAL_FILE, "w")) == NULL) {
                         ALOGE("Can't open Mag Cal file");
                     } else {
-                        for (i=0; i<STM401_MAG_CAL_SIZE; i++) {
+                        for (i=0; i<MSP430_MAG_CAL_SIZE; i++) {
                             fputc(mMagCal[i], fp);
                         }
                         fclose(fp);
@@ -276,7 +276,7 @@ int HubSensor::enable(int32_t handle, int en)
     }
 
     if (found && (new_enabled != mWakeEnabled)) {
-        err = ioctl(dev_fd, STM401_IOCTL_SET_WAKESENSORS, &new_enabled);
+        err = ioctl(dev_fd, MSP430_IOCTL_SET_WAKESENSORS, &new_enabled);
         ALOGE_IF(err, "Could not change sensor state (%s)", strerror(-err));
         if (!err) {
             mWakeEnabled = new_enabled;
@@ -295,11 +295,11 @@ int HubSensor::setDelay(int32_t handle, int64_t ns)
 
     unsigned short delay = int64_t(ns) / 1000000;
     switch (handle) {
-        case ID_A: status = ioctl(dev_fd,  STM401_IOCTL_SET_ACC_DELAY, &delay);   break;
-        case ID_G: status = ioctl(dev_fd,  STM401_IOCTL_SET_GYRO_DELAY, &delay);  break;
-        case ID_PR: status = ioctl(dev_fd,  STM401_IOCTL_SET_PRES_DELAY, &delay); break;
+        case ID_A: status = ioctl(dev_fd,  MSP430_IOCTL_SET_ACC_DELAY, &delay);   break;
+        case ID_G: status = ioctl(dev_fd,  MSP430_IOCTL_SET_GYRO_DELAY, &delay);  break;
+        case ID_PR: status = ioctl(dev_fd,  MSP430_IOCTL_SET_PRES_DELAY, &delay); break;
         case ID_M: /* Mag and orientation get set together */
-        case ID_O: status = ioctl(dev_fd,  STM401_IOCTL_SET_MAG_DELAY, &delay);   break;
+        case ID_O: status = ioctl(dev_fd,  MSP430_IOCTL_SET_MAG_DELAY, &delay);   break;
         case ID_T: status = 0;                                                    break;
         case ID_L: status = 0;                                                    break;
         case ID_LA: status = 0;                                                   break;
@@ -315,13 +315,13 @@ int HubSensor::setDelay(int32_t handle, int64_t ns)
         case ID_CA: status = 0;                                                   break;
         case ID_NFC: status = 0;                                                  break;
         case ID_SIM: status = 0;                                                  break;
-        case ID_UNCALIB_GYRO: status = ioctl(dev_fd,  STM401_IOCTL_SET_GYRO_DELAY, &delay); break;
-        case ID_UNCALIB_MAG: status = ioctl(dev_fd,  STM401_IOCTL_SET_MAG_DELAY, &delay);  break;
+        case ID_UNCALIB_GYRO: status = ioctl(dev_fd,  MSP430_IOCTL_SET_GYRO_DELAY, &delay); break;
+        case ID_UNCALIB_MAG: status = ioctl(dev_fd,  MSP430_IOCTL_SET_MAG_DELAY, &delay);  break;
         case ID_STEP_COUNTER:
 		    delay /= 1000; // convert to seconds for pedometer rate
 		    if (delay == 0)
 		        delay = 1;
-		    status = ioctl(dev_fd,  STM401_IOCTL_SET_STEP_COUNTER_DELAY, &delay);
+		    status = ioctl(dev_fd,  MSP430_IOCTL_SET_STEP_COUNTER_DELAY, &delay);
 		    break;
         case ID_STEP_DETECTOR:status = 0;                                         break;
     }
@@ -331,7 +331,7 @@ int HubSensor::setDelay(int32_t handle, int64_t ns)
 int HubSensor::readEvents(sensors_event_t* data, int count)
 {
     int numEventReceived = 0;
-    struct stm401_android_sensor_data buff;
+    struct msp430_android_sensor_data buff;
     int ret;
     char timeBuf[32];
     struct tm* ptm = NULL;
@@ -340,7 +340,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
 
     if (count < 1)
         return -EINVAL;
-    while (((ret = read(data_fd, &buff, sizeof(struct stm401_android_sensor_data))) != 0)  && count) {
+    while (((ret = read(data_fd, &buff, sizeof(struct msp430_android_sensor_data))) != 0)  && count) {
         /* these sensors are not supported, upload a bug2go if its been at least 10mins since previous bug2go*/
         /* remove this if-clause when corruption issue resolved */
         if (buff.type == DT_PRESSURE || buff.type == DT_TEMP || buff.type == DT_LIN_ACCEL ||
@@ -620,7 +620,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_CA;
                 data->type = SENSOR_TYPE_CAMERA_ACTIVATE;
-                data->data[0] = STM401_CAMERA_DATA;
+                data->data[0] = MSP430_CAMERA_DATA;
                 data->data[1] = STM16TOH(buff.data + CAMERA_CAMERA);
                 data->timestamp = buff.timestamp;
                 data++;
@@ -674,7 +674,7 @@ gzFile HubSensor::open_dropbox_file(const char* timestamp, const char* dst, cons
 
     snprintf(dropbox_path, sizeof(dropbox_path), "%s/%s:%d:%u-%s",
              DROPBOX_DIR, DROPBOX_TAG, flags, pid, timestamp);
-    ALOGD("stm401 - dumping to dropbox file[%s]...\n", dropbox_path);
+    ALOGD("msp430 - dumping to dropbox file[%s]...\n", dropbox_path);
 
     return gzopen(dropbox_path, "wb");
 }

@@ -30,18 +30,18 @@
 
 #include <linux/android_alarm.h>
 #include <linux/input.h>
-#include <linux/stm401.h>
+#include <linux/msp430.h>
 
 #include <sys/ioctl.h>
 #include <sys/poll.h>
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include <hardware/mot_sensorhub_stm401.h>
+#include <hardware/mot_sensorhub_msp430.h>
 
 /* paths to the driver fds */
-#define DRIVER_CONTROL_PATH "/dev/stm401"
-#define DRIVER_DATA_NAME "/dev/stm401_ms"
+#define DRIVER_CONTROL_PATH "/dev/msp430"
+#define DRIVER_DATA_NAME "/dev/msp430_ms"
 
 /* Constants and helper macro for accessing sensor hub event data. */
 #define MOVE_VALUE 0
@@ -58,7 +58,7 @@
 
 #define GENERIC_INT_OFFSET 0
 
-#define STMLE16TOH(p) (int16_t) le16toh(*((uint16_t *) (p)))
+#define MSPLE16TOH(p) (int16_t) le16toh(*((uint16_t *) (p)))
 
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -114,13 +114,13 @@ static int sensorhub_enable(struct sensorhub_device_t* device, struct sensorhub_
     case SENSORHUB_ALGO_MOVEMENT:
         if (algo->enable) {
             data = algo->parameter[0];
-            if (ioctl(context->control_fd, STM401_IOCTL_SET_MOTION_DUR, &data) < 0) {
-                ALOGE("STM401_IOCTL_SET_MOTION_DUR error (%s)", strerror(errno));
+            if (ioctl(context->control_fd, MSP430_IOCTL_SET_MOTION_DUR, &data) < 0) {
+                ALOGE("MSP430_IOCTL_SET_MOTION_DUR error (%s)", strerror(errno));
                 error = -errno;
             }
             data = algo->parameter[1];
-            if (ioctl(context->control_fd, STM401_IOCTL_SET_ZRMOTION_DUR, &data) < 0) {
-                ALOGE("STM401_IOCTL_SET_ZRMOTION_DUR error (%s)", strerror(errno));
+            if (ioctl(context->control_fd, MSP430_IOCTL_SET_ZRMOTION_DUR, &data) < 0) {
+                ALOGE("MSP430_IOCTL_SET_ZRMOTION_DUR error (%s)", strerror(errno));
                 error = -errno;
             }
             data = context->active_algos | (M_MMOVEME | M_NOMMOVE);
@@ -131,8 +131,8 @@ static int sensorhub_enable(struct sensorhub_device_t* device, struct sensorhub_
     }
 
     if (!error) {
-        if (ioctl(context->control_fd, STM401_IOCTL_SET_ALGOS, &data) < 0) {
-            ALOGE("STM401_IOCTL_SET_ALGOS error (%s)", strerror(errno));
+        if (ioctl(context->control_fd, MSP430_IOCTL_SET_ALGOS, &data) < 0) {
+            ALOGE("MSP430_IOCTL_SET_ALGOS error (%s)", strerror(errno));
             error = -errno;
         }
     }
@@ -201,15 +201,15 @@ static int sensorhub_algo_req(struct sensorhub_device_t* device, uint16_t algo,
         }
     }
 
-    if (ioctl(context->control_fd, STM401_IOCTL_SET_ALGO_REQ, bytes) < 0) {
-        ALOGE("STM401_IOCTL_SET_ALGO_REQ error (%s)", strerror(errno));
+    if (ioctl(context->control_fd, MSP430_IOCTL_SET_ALGO_REQ, bytes) < 0) {
+        ALOGE("MSP430_IOCTL_SET_ALGO_REQ error (%s)", strerror(errno));
         error = -errno;
     } else {
         context->active_parts[algo] = active_parts;
 
         // ioctl set algos
-        if (ioctl(context->control_fd, STM401_IOCTL_SET_ALGOS, &algos) < 0) {
-            ALOGE("STM401_IOCTL_SET_ALGOS error (%s)", strerror(errno));
+        if (ioctl(context->control_fd, MSP430_IOCTL_SET_ALGOS, &algos) < 0) {
+            ALOGE("MSP430_IOCTL_SET_ALGOS error (%s)", strerror(errno));
             error = -errno;
         } else {
             context->active_algos = algos;
@@ -226,9 +226,9 @@ static int sensorhub_algo_query(struct sensorhub_device_t* device, uint16_t algo
     int i, evt_reg_size, error = 0;
 
     if (algo == SENSORHUB_ALGO_ACCUM_MVMT) {
-        evt_reg_size = STM401_EVT_SZ_ACCUM_MVMT;
+        evt_reg_size = MSP430_EVT_SZ_ACCUM_MVMT;
     } else {
-        evt_reg_size = STM401_EVT_SZ_TRANSITION;
+        evt_reg_size = MSP430_EVT_SZ_TRANSITION;
     }
 
     unsigned char bytes[sizeof(algo) + evt_reg_size];
@@ -238,8 +238,8 @@ static int sensorhub_algo_query(struct sensorhub_device_t* device, uint16_t algo
 
     memcpy(bytes, &algo, sizeof(algo));
 
-    if (ioctl(context->control_fd, STM401_IOCTL_GET_ALGO_EVT, bytes) < 0) {
-        ALOGE("STM401_IOCTL_GET_ALGO_EVT error (%s)", strerror(errno));
+    if (ioctl(context->control_fd, MSP430_IOCTL_GET_ALGO_EVT, bytes) < 0) {
+        ALOGE("MSP430_IOCTL_GET_ALGO_EVT error (%s)", strerror(errno));
         error = -errno;
     } else {
         // just clear time for query output
@@ -268,7 +268,7 @@ static int sensorhub_algo_query(struct sensorhub_device_t* device, uint16_t algo
 static int sensorhub_poll(struct sensorhub_device_t* device, struct sensorhub_event_t* event)
 {
     struct sensorhub_context_t* context = (struct sensorhub_context_t*)device;
-    struct stm401_moto_sensor_data buff;
+    struct msp430_moto_sensor_data buff;
     int64_t elapsed_ms;
     uint16_t algo;
     int ret;
@@ -280,7 +280,7 @@ static int sensorhub_poll(struct sensorhub_device_t* device, struct sensorhub_ev
         return -errno;
     }
 
-    ret = read(context->data_pollfd.fd, &buff, sizeof(struct stm401_moto_sensor_data));
+    ret = read(context->data_pollfd.fd, &buff, sizeof(struct msp430_moto_sensor_data));
     if (ret == 0)
         return 0;
 
@@ -302,26 +302,26 @@ static int sensorhub_poll(struct sensorhub_device_t* device, struct sensorhub_ev
             event->ertime = elapsed_ms > 0 ? elapsed_ms : 0;
             if (algo == SENSORHUB_ALGO_ACCUM_MVMT) {
                 event->type = SENSORHUB_EVENT_ACCUM_MVMT;
-                event->time_s = STMLE16TOH(buff.data + ALGO_TIME);
-                event->distance = STMLE16TOH(buff.data + ALGO_DISTANCE);
+                event->time_s = MSPLE16TOH(buff.data + ALGO_TIME);
+                event->distance = MSPLE16TOH(buff.data + ALGO_DISTANCE);
                 //ALOGD("sensorhub_poll(): accum mvmt: time_s: %d, distance: %d",
                 //    event->time_s, event->distance);
             } else
             if (algo == SENSORHUB_ALGO_ACCUM_MODALITY) {
                 event->type = SENSORHUB_EVENT_ACCUM_STATE;
                 event->accum_algo = algo;
-                event->id = STMLE16TOH(buff.data + ALGO_ID);
+                event->id = MSPLE16TOH(buff.data + ALGO_ID);
             } else {
                 event->type = SENSORHUB_EVENT_TRANSITION;
-                elapsed_ms = STMLE16TOH(buff.data + ALGO_MS) * 1000;
+                elapsed_ms = MSPLE16TOH(buff.data + ALGO_MS) * 1000;
                 event->time -= elapsed_ms;
                 if (event->ertime > 0)
                     event->ertime -= elapsed_ms;
                 event->algo = algo;
                 event->past = (buff.data[ALGO_PAST] & 0x80) > 0;
                 event->confidence = buff.data[ALGO_CONFIDENCE] & 0x7F;
-                event->old_state = STMLE16TOH(buff.data + ALGO_OLDSTATE);
-                event->new_state = STMLE16TOH(buff.data + ALGO_NEWSTATE);
+                event->old_state = MSPLE16TOH(buff.data + ALGO_OLDSTATE);
+                event->new_state = MSPLE16TOH(buff.data + ALGO_NEWSTATE);
                 //ALOGD("sensorhub_poll(): tran: algo: %d, elapsed: %lld, t: %lld, ert: %lld",
                 //    event->algo, elapsed_ms, event->time, event->ertime);
             }

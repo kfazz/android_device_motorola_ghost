@@ -26,7 +26,7 @@
 #include <time.h>
 #include <private/android_filesystem_config.h>
 
-#include "linux/stm401.h"
+#include "linux/msp430.h"
 
 #include "nusensors.h"
 #include "SensorBase.h"
@@ -139,7 +139,7 @@ private:
     uint32_t mEnabled;
     uint32_t mWakeEnabled;
     uint32_t mPendingMask;
-    uint8_t mMagCal[STM401_MAG_CAL_SIZE];
+    uint8_t mMagCal[MSP_MAG_CAL_SIZE];
     gzFile open_dropbox_file(const char* timestamp, const char* dst, const int flags);
     short capture_dump(char* timestamp, const int id, const char* dst, const int flags);
 };

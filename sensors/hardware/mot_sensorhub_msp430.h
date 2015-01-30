@@ -11,7 +11,7 @@
 #include <sys/types.h>
 
 #include <hardware/hardware.h>
-#include <linux/stm401.h>
+#include <linux/msp430.h>
 
 __BEGIN_DECLS
 
@@ -32,11 +32,11 @@ __BEGIN_DECLS
 #define SENSOR_TYPE_IR_RAW              40
 
 // com.motorola.slpc.modalitymanager algorithms
-#define SENSORHUB_ALGO_MODALITY         STM401_IDX_MODALITY
-#define SENSORHUB_ALGO_ORIENTATION      STM401_IDX_ORIENTATION
-#define SENSORHUB_ALGO_STOWED           STM401_IDX_STOWED
-#define SENSORHUB_ALGO_ACCUM_MODALITY   STM401_IDX_ACCUM_MODALITY
-#define SENSORHUB_ALGO_ACCUM_MVMT       STM401_IDX_ACCUM_MVMT
+#define SENSORHUB_ALGO_MODALITY         MSP430_IDX_MODALITY
+#define SENSORHUB_ALGO_ORIENTATION      MSP430_IDX_ORIENTATION
+#define SENSORHUB_ALGO_STOWED           MSP430_IDX_STOWED
+#define SENSORHUB_ALGO_ACCUM_MODALITY   MSP430_IDX_ACCUM_MODALITY
+#define SENSORHUB_ALGO_ACCUM_MVMT       MSP430_IDX_ACCUM_MVMT
 
 // original movement algorithm
 #define SENSORHUB_ALGO_MOVEMENT         5

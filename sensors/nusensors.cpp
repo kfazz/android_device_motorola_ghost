@@ -31,7 +31,7 @@
 #include <sys/select.h>
 
 #include "nusensors.h"
-#include "stm401_hal.h"
+#include "msp430_hal.h"
 
 /*****************************************************************************/
 
