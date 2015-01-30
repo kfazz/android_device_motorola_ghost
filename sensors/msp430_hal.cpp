@@ -33,6 +33,9 @@
 
 #include "msp430_hal.h"
 
+//stop logging to /data partition
+#define DONTBUGME 1
+
 /*****************************************************************************/
 
 HubSensor::HubSensor()
@@ -270,6 +273,7 @@ int HubSensor::enable(int32_t handle, int en)
             found = 1;
             break;
         case ID_SIM:
+            ALOGE("Signifigant Motion enabled? %d", newState);
             new_enabled &= ~M_SIM;
             if (newState)
                 new_enabled |= M_SIM;
@@ -343,8 +347,10 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
     if (count < 1)
         return -EINVAL;
     while (((ret = read(data_fd, &buff, sizeof(struct msp430_android_sensor_data))) != 0)  && count) {
+#ifndef DONTBUGME
         /* these sensors are not supported, upload a bug2go if its been at least 10mins since previous bug2go*/
         /* remove this if-clause when corruption issue resolved */
+
         if (buff.type == DT_PRESSURE || buff.type == DT_TEMP || buff.type == DT_LIN_ACCEL ||
             buff.type == DT_GRAVITY || buff.type == DT_DOCK || buff.type == DT_QUATERNION ||
             buff.type == DT_NFC) {
@@ -363,6 +369,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
             }
             continue;
         }
+#endif
 
         switch (buff.type) {
             case DT_ACCEL:
@@ -642,6 +649,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 numEventReceived++;
                 break;
             case DT_SIM:
+		ALOGE("Signifigant Motion Event");
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_SIM;
                 data->type = SENSOR_TYPE_SIGNIFICANT_MOTION;
@@ -654,6 +662,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 break;
             case DT_RESET:
                 count--;
+#ifndef DONTBUGME
                 // put timestamp in dropbox file
                 time(&timeutc.tv_sec);
                 ptm = localtime(&(timeutc.tv_sec));
@@ -662,6 +671,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                     capture_dump(timeBuf, buff.data1, SENSORHUB_DUMPFILE,
                          DROPBOX_FLAG_TEXT | DROPBOX_FLAG_GZIP);
                 }
+#endif
                 break;
             default:
                 break;
