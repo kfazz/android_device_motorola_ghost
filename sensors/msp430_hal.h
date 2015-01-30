@@ -122,8 +122,8 @@
 #define IR_AMBIENT_H  (8 * sizeof(int16_t))
 #define IR_AMBIENT_L  (9 * sizeof(int16_t))
 
-#define MSP16TOH(p) (int16_t) be16toh(p)
-#define MSP32TOH(p) (int32_t) be32toh(p)
+#define MSP16TOH(p) (int16_t) (p) //be16toh(p)
+#define MSP32TOH(p) (int32_t) (p) //be32toh(p)
 
 struct input_event;
 
