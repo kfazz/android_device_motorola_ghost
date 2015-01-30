@@ -42,6 +42,8 @@
 #define DROPBOX_FLAG_GZIP        4
 #define COPYSIZE 256
 
+#define MSP430_CAMERA_DATA 0x01
+
 // Defines for offsets into the sensorhub event data.
 #define ACCEL_X (0 * sizeof(int16_t))
 #define ACCEL_Y (1 * sizeof(int16_t))

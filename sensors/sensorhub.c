@@ -226,9 +226,9 @@ static int sensorhub_algo_query(struct sensorhub_device_t* device, uint16_t algo
     int i, evt_reg_size, error = 0;
 
     if (algo == SENSORHUB_ALGO_ACCUM_MVMT) {
-        evt_reg_size = MSP430_EVT_SZ_ACCUM_MVMT;
+        evt_reg_size = MSP_EVT_SZ_ACCUM_MVMT;
     } else {
-        evt_reg_size = MSP430_EVT_SZ_TRANSITION;
+        evt_reg_size = MSP_EVT_SZ_TRANSITION;
     }
 
     unsigned char bytes[sizeof(algo) + evt_reg_size];
@@ -287,41 +287,41 @@ static int sensorhub_poll(struct sensorhub_device_t* device, struct sensorhub_ev
     switch (buff.type) {
         case DT_MMMOVE:
             event->type = SENSORHUB_EVENT_START_MOVEMENT;
-            event->value[2] = buff.data[MOVE_VALUE] >> 4;
+            event->value[2] = buff.data1 >> 4;
             break;
         case DT_NOMOVE:
             event->type = SENSORHUB_EVENT_END_MOVEMENT;
-            event->value[2] = buff.data[MOVE_VALUE] >> 4;
+            event->value[2] = buff.data1 >> 4;
             break;
         case DT_ALGO_EVT:
             // These events are sent little endian and are different from
             // all other sensorhub data which are sent big endian.
-            algo = buff.data[ALGO_ALGO];
+            algo = buff.data1; //FIXME
             event->time = get_wall_clock();
             elapsed_ms = get_elapsed_realtime();
             event->ertime = elapsed_ms > 0 ? elapsed_ms : 0;
             if (algo == SENSORHUB_ALGO_ACCUM_MVMT) {
                 event->type = SENSORHUB_EVENT_ACCUM_MVMT;
-                event->time_s = MSPLE16TOH(buff.data + ALGO_TIME);
-                event->distance = MSPLE16TOH(buff.data + ALGO_DISTANCE);
+                event->time_s = MSPLE16TOH(buff.data2);
+                event->distance = MSPLE16TOH(buff.data4);
                 //ALOGD("sensorhub_poll(): accum mvmt: time_s: %d, distance: %d",
                 //    event->time_s, event->distance);
             } else
             if (algo == SENSORHUB_ALGO_ACCUM_MODALITY) {
                 event->type = SENSORHUB_EVENT_ACCUM_STATE;
                 event->accum_algo = algo;
-                event->id = MSPLE16TOH(buff.data + ALGO_ID);
+                event->id = MSPLE16TOH(buff.data1);
             } else {
                 event->type = SENSORHUB_EVENT_TRANSITION;
-                elapsed_ms = MSPLE16TOH(buff.data + ALGO_MS) * 1000;
+                elapsed_ms = MSPLE16TOH(buff.data4) * 1000;
                 event->time -= elapsed_ms;
                 if (event->ertime > 0)
                     event->ertime -= elapsed_ms;
                 event->algo = algo;
-                event->past = (buff.data[ALGO_PAST] & 0x80) > 0;
-                event->confidence = buff.data[ALGO_CONFIDENCE] & 0x7F;
-                event->old_state = MSPLE16TOH(buff.data + ALGO_OLDSTATE);
-                event->new_state = MSPLE16TOH(buff.data + ALGO_NEWSTATE);
+                event->past = (buff.data1 & 0x80) > 0;
+                event->confidence = buff.data1 & 0x7F;
+                event->old_state = MSPLE16TOH(buff.data2);
+                event->new_state = MSPLE16TOH(buff.data4);
                 //ALOGD("sensorhub_poll(): tran: algo: %d, elapsed: %lld, t: %lld, ert: %lld",
                 //    event->algo, elapsed_ms, event->time, event->ertime);
             }
