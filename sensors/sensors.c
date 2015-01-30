@@ -97,11 +97,11 @@ static const struct sensor_t sSensorList[] = {
                 "Motorola",
                 1, SENSORS_HANDLE_BASE+ID_IR_RAW,
                 SENSOR_TYPE_IR_RAW, 4096.0f, 1.0f, 1.0f, 10000, 0, 0, { 0 } },
+*/
     { "Significant Motion sensor",
                 "Motorola",
                 1, SENSORS_HANDLE_BASE+ID_SIM,
                 SENSOR_TYPE_SIGNIFICANT_MOTION, 1.0f, 1.0f, 3.0f, -1, 0, 0, { 0 } },
-    */
     { "Step Detector sensor",
                 "Motorola",
                 1, SENSORS_HANDLE_BASE+ID_STEP_DETECTOR,

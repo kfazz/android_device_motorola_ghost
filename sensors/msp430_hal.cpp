@@ -369,9 +369,9 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_A;
                 data->type = SENSOR_TYPE_ACCELEROMETER;
-                data->acceleration.x = STM16TOH(buff.data1) * CONVERT_A_X;
-                data->acceleration.y = STM16TOH(buff.data2) * CONVERT_A_Y;
-                data->acceleration.z = STM16TOH(buff.data3) * CONVERT_A_Z;
+                data->acceleration.x = MSP16TOH(buff.data1) * CONVERT_A_X;
+                data->acceleration.y = MSP16TOH(buff.data2) * CONVERT_A_Y;
+                data->acceleration.z = MSP16TOH(buff.data3) * CONVERT_A_Z;
                 data->acceleration.status = SENSOR_STATUS_ACCURACY_HIGH;
                 data->timestamp = buff.timestamp;
                 data++;
@@ -382,9 +382,9 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_G;
                 data->type = SENSOR_TYPE_GYROSCOPE;
-                data->gyro.x = STM16TOH(buff.data1) * CONVERT_G_P;
-                data->gyro.y = STM16TOH(buff.data2) * CONVERT_G_R;
-                data->gyro.z = STM16TOH(buff.data3) * CONVERT_G_Y;
+                data->gyro.x = MSP16TOH(buff.data1) * CONVERT_G_P;
+                data->gyro.y = MSP16TOH(buff.data2) * CONVERT_G_R;
+                data->gyro.z = MSP16TOH(buff.data3) * CONVERT_G_Y;
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -395,12 +395,12 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_UNCALIB_GYRO;
                 data->type = SENSOR_TYPE_GYROSCOPE_UNCALIBRATED;
-                data->uncalibrated_gyro.x_uncalib = STM16TOH(buff.data1) * CONVERT_G_P;
-                data->uncalibrated_gyro.y_uncalib = STM16TOH(buff.data2) * CONVERT_G_R;
-                data->uncalibrated_gyro.z_uncalib = STM16TOH(buff.data3) * CONVERT_G_Y;
-                data->uncalibrated_gyro.x_bias = STM16TOH(buff.data4) * CONVERT_BIAS_G_P;
-                data->uncalibrated_gyro.y_bias = STM16TOH(buff.data5) * CONVERT_BIAS_G_R;
-                data->uncalibrated_gyro.z_bias = STM16TOH(buff.data6) * CONVERT_BIAS_G_Y;
+                data->uncalibrated_gyro.x_uncalib = MSP16TOH(buff.data1) * CONVERT_G_P;
+                data->uncalibrated_gyro.y_uncalib = MSP16TOH(buff.data2) * CONVERT_G_R;
+                data->uncalibrated_gyro.z_uncalib = MSP16TOH(buff.data3) * CONVERT_G_Y;
+                data->uncalibrated_gyro.x_bias = MSP16TOH(buff.data4) * CONVERT_BIAS_G_P;
+                data->uncalibrated_gyro.y_bias = MSP16TOH(buff.data5) * CONVERT_BIAS_G_R;
+                data->uncalibrated_gyro.z_bias = MSP16TOH(buff.data6) * CONVERT_BIAS_G_Y;
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -410,12 +410,12 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_UNCALIB_MAG;
                 data->type = SENSOR_TYPE_MAGNETIC_FIELD_UNCALIBRATED;
-                data->uncalibrated_magnetic.x_uncalib = STM16TOH(buff.data1) * CONVERT_M_X;
-                data->uncalibrated_magnetic.y_uncalib = STM16TOH(buff.data2) * CONVERT_M_Y;
-                data->uncalibrated_magnetic.z_uncalib = STM16TOH(buff.data3) * CONVERT_M_Z;
-                data->uncalibrated_magnetic.x_bias = STM16TOH(buff.data4) * CONVERT_BIAS_M_X;
-                data->uncalibrated_magnetic.y_bias = STM16TOH(buff.data5) * CONVERT_BIAS_M_Y;
-                data->uncalibrated_magnetic.z_bias = STM16TOH(buff.data6) * CONVERT_BIAS_M_Z;
+                data->uncalibrated_magnetic.x_uncalib = MSP16TOH(buff.data1) * CONVERT_M_X;
+                data->uncalibrated_magnetic.y_uncalib = MSP16TOH(buff.data2) * CONVERT_M_Y;
+                data->uncalibrated_magnetic.z_uncalib = MSP16TOH(buff.data3) * CONVERT_M_Z;
+                data->uncalibrated_magnetic.x_bias = MSP16TOH(buff.data4) * CONVERT_BIAS_M_X;
+                data->uncalibrated_magnetic.y_bias = MSP16TOH(buff.data5) * CONVERT_BIAS_M_Y;
+                data->uncalibrated_magnetic.z_bias = MSP16TOH(buff.data6) * CONVERT_BIAS_M_Z;
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -427,10 +427,10 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->sensor = ID_STEP_COUNTER;
                 data->type = SENSOR_TYPE_STEP_COUNTER;
                 data->u64.step_counter =  (
-                        (((uint64_t)STM16TOH(buff.data4)) << 48) |
-                        (((uint64_t)STM16TOH(buff.data3)) << 32) |
-                        (((uint64_t)STM16TOH(buff.data2)) << 16) |
-                        (((uint64_t)STM16TOH(buff.data1))) );
+                        (((uint64_t)MSP16TOH(buff.data4)) << 48) |
+                        (((uint64_t)MSP16TOH(buff.data3)) << 32) |
+                        (((uint64_t)MSP16TOH(buff.data2)) << 16) |
+                        (((uint64_t)MSP16TOH(buff.data1))) );
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -440,7 +440,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_STEP_DETECTOR;
                 data->type = SENSOR_TYPE_STEP_DETECTOR;
-                data->data[0] = STM16TOH(buff.data1);
+                data->data[0] = MSP16TOH(buff.data1);
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -450,7 +450,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_PR;
                 data->type = SENSOR_TYPE_PRESSURE;
-                data->pressure = STM32TOH(buff.data1) * CONVERT_B; //FIXME?
+                data->pressure = MSP32TOH(buff.data1) * CONVERT_B; //FIXME?
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -460,9 +460,9 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_M;
                 data->type = SENSOR_TYPE_MAGNETIC_FIELD;
-                data->magnetic.x = STM16TOH(buff.data1) * CONVERT_M_X;
-                data->magnetic.y = STM16TOH(buff.data2) * CONVERT_M_Y;
-                data->magnetic.z = STM16TOH(buff.data3) * CONVERT_M_Z;
+                data->magnetic.x = MSP16TOH(buff.data1) * CONVERT_M_X;
+                data->magnetic.y = MSP16TOH(buff.data2) * CONVERT_M_Y;
+                data->magnetic.z = MSP16TOH(buff.data3) * CONVERT_M_Z;
                 data->magnetic.status = buff.status;
                 data->timestamp = buff.timestamp;
                 data++;
@@ -473,10 +473,10 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_O;
                 data->type = SENSOR_TYPE_ORIENTATION;
-                data->orientation.azimuth = STM16TOH(buff.data1) * CONVERT_O_Y;
-                data->orientation.pitch = STM16TOH(buff.data2) * CONVERT_O_P;
+                data->orientation.azimuth = MSP16TOH(buff.data1) * CONVERT_O_Y;
+                data->orientation.pitch = MSP16TOH(buff.data2) * CONVERT_O_P;
                 // Roll value needs to be negated.
-                data->orientation.roll = -STM16TOH(buff.data3) * CONVERT_O_R;
+                data->orientation.roll = -MSP16TOH(buff.data3) * CONVERT_O_R;
                 data->orientation.status = buff.status;
                 data->timestamp = buff.timestamp;
                 data++;
@@ -487,7 +487,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_T;
                 data->type = SENSOR_TYPE_TEMPERATURE;
-                data->temperature = STM16TOH(buff.data1) * CONVERT_T;
+                data->temperature = MSP16TOH(buff.data1) * CONVERT_T;
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -497,7 +497,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_L;
                 data->type = SENSOR_TYPE_LIGHT;
-                data->light = (uint16_t)STM16TOH(buff.data1);
+                data->light = (uint16_t)MSP16TOH(buff.data1);
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -507,9 +507,9 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_LA;
                 data->type = SENSOR_TYPE_LINEAR_ACCELERATION;
-                data->acceleration.x = STM16TOH(buff.data1) * CONVERT_A_LIN;
-                data->acceleration.y = STM16TOH(buff.data2) * CONVERT_A_LIN;
-                data->acceleration.z = STM16TOH(buff.data3) * CONVERT_A_LIN;
+                data->acceleration.x = MSP16TOH(buff.data1) * CONVERT_A_LIN;
+                data->acceleration.y = MSP16TOH(buff.data2) * CONVERT_A_LIN;
+                data->acceleration.z = MSP16TOH(buff.data3) * CONVERT_A_LIN;
                 data->acceleration.status = SENSOR_STATUS_ACCURACY_HIGH;
                 data->timestamp = buff.timestamp;
                 data++;
@@ -522,9 +522,9 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_GR;
                 data->type = SENSOR_TYPE_GRAVITY;
-                data->acceleration.x = STM16TOH(buff.data1) * CONVERT_A_GRAV;
-                data->acceleration.y = STM16TOH(buff.data2) * CONVERT_A_GRAV;
-                data->acceleration.z = STM16TOH(buff.data3) * CONVERT_A_GRAV;
+                data->acceleration.x = MSP16TOH(buff.data1) * CONVERT_A_GRAV;
+                data->acceleration.y = MSP16TOH(buff.data2) * CONVERT_A_GRAV;
+                data->acceleration.z = MSP16TOH(buff.data3) * CONVERT_A_GRAV;
                 data->acceleration.status = SENSOR_STATUS_ACCURACY_HIGH;
                 data->timestamp = buff.timestamp;
                 data++;
@@ -625,7 +625,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->sensor = ID_CA;
                 data->type = SENSOR_TYPE_CAMERA_ACTIVATE;
                 data->data[0] = MSP430_CAMERA_DATA;
-                data->data[1] = STM16TOH(buff.data1);
+                data->data[1] = MSP16TOH(buff.data1);
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -645,7 +645,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_SIM;
                 data->type = SENSOR_TYPE_SIGNIFICANT_MOTION;
-                data->data[0] = STM16TOH(buff.data1);
+                data->data[0] = MSP16TOH(buff.data1);
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;

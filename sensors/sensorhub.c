@@ -58,7 +58,7 @@
 
 #define GENERIC_INT_OFFSET 0
 
-#define MSPLE16TOH(p) (int16_t) le16toh(*((uint16_t *) (p)))
+#define MSPLE16TOH(p) (int16_t) le16toh(p)
 
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
