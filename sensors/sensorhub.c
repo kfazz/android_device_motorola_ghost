@@ -296,7 +296,7 @@ static int sensorhub_poll(struct sensorhub_device_t* device, struct sensorhub_ev
         case DT_ALGO_EVT:
             // These events are sent little endian and are different from
             // all other sensorhub data which are sent big endian.
-            algo = buff.data1; //FIXME
+            algo = (buff.data1&0xFF00)>>8;
             event->time = get_wall_clock();
             elapsed_ms = get_elapsed_realtime();
             event->ertime = elapsed_ms > 0 ? elapsed_ms : 0;
@@ -304,13 +304,13 @@ static int sensorhub_poll(struct sensorhub_device_t* device, struct sensorhub_ev
                 event->type = SENSORHUB_EVENT_ACCUM_MVMT;
                 event->time_s = MSPLE16TOH(buff.data2);
                 event->distance = MSPLE16TOH(buff.data4);
-                //ALOGD("sensorhub_poll(): accum mvmt: time_s: %d, distance: %d",
-                //    event->time_s, event->distance);
+                ALOGD("sensorhub_poll(): accum mvmt: time_s: %d, distance: %d",
+                    event->time_s, event->distance);
             } else
             if (algo == SENSORHUB_ALGO_ACCUM_MODALITY) {
                 event->type = SENSORHUB_EVENT_ACCUM_STATE;
                 event->accum_algo = algo;
-                event->id = MSPLE16TOH(buff.data1);
+                event->id = MSPLE16TOH(buff.data2);
             } else {
                 event->type = SENSORHUB_EVENT_TRANSITION;
                 elapsed_ms = MSPLE16TOH(buff.data4) * 1000;
@@ -321,19 +321,17 @@ static int sensorhub_poll(struct sensorhub_device_t* device, struct sensorhub_ev
                 event->past = (buff.data1 & 0x80) > 0;
                 event->confidence = buff.data1 & 0x7F;
                 event->old_state = MSPLE16TOH(buff.data2);
-                event->new_state = MSPLE16TOH(buff.data4);
-                //ALOGD("sensorhub_poll(): tran: algo: %d, elapsed: %lld, t: %lld, ert: %lld",
-                //    event->algo, elapsed_ms, event->time, event->ertime);
+                event->new_state = MSPLE16TOH(buff.data3);
+                ALOGD("sensorhub_poll(): tran: algo: %d, elapsed: %lld, t: %lld, ert: %lld",
+                    event->algo, elapsed_ms, event->time, event->ertime);
             }
             break;
         case DT_GENERIC_INT:
-#if 0
             // packaging irq3_status into ertime field
             // of the event
             event->type = SENSORHUB_EVENT_GENERIC_CB;
             event->time = get_wall_clock();
-            event->ertime = buff.data[GENERIC_INT_OFFSET];
-#endif
+            event->ertime = buff.data1;
             context->data_pollfd.revents = 0;
             return 0;
             break;
