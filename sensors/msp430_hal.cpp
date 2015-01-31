@@ -457,9 +457,8 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_PR;
                 data->type = SENSOR_TYPE_PRESSURE;
-                data->pressure = (
-                        (((uint32_t)MSP16TOH(buff.data1)) << 16) |
-                        (((uint32_t)MSP16TOH(buff.data2))) ) * CONVERT_B;
+                data->pressure = (uint32_t)(((MSP16TOH(buff.data1)) << 16) | ((MSP16TOH(buff.data2) & 0xFFFF)))* CONVERT_B;
+
 
                 data->timestamp = buff.timestamp;
                 data++;
