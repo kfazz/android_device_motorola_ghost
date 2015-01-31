@@ -457,7 +457,10 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 data->version = SENSORS_EVENT_T_SIZE;
                 data->sensor = ID_PR;
                 data->type = SENSOR_TYPE_PRESSURE;
-                data->pressure = MSP32TOH(buff.data1) * CONVERT_B; //FIXME?
+                data->pressure = (
+                        (((uint32_t)MSP16TOH(buff.data1)) << 16) |
+                        (((uint32_t)MSP16TOH(buff.data2))) ) * CONVERT_B;
+
                 data->timestamp = buff.timestamp;
                 data++;
                 count--;
@@ -524,6 +527,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
                 numEventReceived++;
                 break;
             case DT_QUATERNION:
+                ALOGE("Quaternion event unhandled");
                 break;
             case DT_GRAVITY:
                 data->version = SENSORS_EVENT_T_SIZE;
@@ -674,6 +678,7 @@ int HubSensor::readEvents(sensors_event_t* data, int count)
 #endif
                 break;
             default:
+                ALOGE("Default case %x event unhandled", buff.type);
                 break;
         }
     }
