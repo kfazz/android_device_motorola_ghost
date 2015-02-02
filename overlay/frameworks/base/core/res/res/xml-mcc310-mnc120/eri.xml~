@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<EriFile VersionNumber="7" NumberOfEriEntries="19" EriFileType="2">
+<EriFile VersionNumber="6" NumberOfEriEntries="19" EriFileType="2">
     <CallPromptId Id="0" CallPromptText="CallPromptId0" />
     <CallPromptId Id="1" CallPromptText="CallPromptId1" />
     <CallPromptId Id="2" CallPromptText="CallPromptId2" />
